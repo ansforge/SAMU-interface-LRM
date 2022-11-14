@@ -18,18 +18,18 @@ jobs:
       - name: Generate docs for LRM interface
         uses: seeebiii/redoc-cli-github-action@v10
         with:
-          args: 'bundle swagger-lrm.json -o lrm.html'
+          args: 'bundle swagger-lrm.json -o docs/lrm.html'
 
       - name: Generate docs for SI-SAMU interface
         uses: seeebiii/redoc-cli-github-action@v10
         with:
-          args: 'bundle swagger-si-samu.json -o si-samu.html'
+          args: 'bundle swagger-si-samu.json -o docs/si-samu.html'
 
       - name: Commit files
         run: |
           git config --local user.email "Docs-Generator[bot]@users.noreply.github.com"
           git config --local user.name "Docs-Generator[bot]"
-          git add lrm.html si-samu.html
+          git add docs/lrm.html docs/si-samu.html
           git commit -m "🦾 Auto-génération des sites de documentation"
 
       - name: Push changes
