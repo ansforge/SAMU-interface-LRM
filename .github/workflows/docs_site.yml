@@ -1,23 +1,41 @@
-name: Documentation Site Builder
+name: Documentation Site Generator
 
-on:
-  push:
-    branches:
-      - master
-      - main
-      - test_workflows
+on: [pull_request, pull_request_target]
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    name: Test
+    name: Generating docs files
     steps:
       # first checkout your code
       - name: Checkout
         uses: actions/checkout@v2
 
       # then use redoc-cli-github-action to generate your HTML bundle
-      - name: redoc-cli
+      - name: redoc-cli for LRM interface
         uses: seeebiii/redoc-cli-github-action@v10
         with:
-          args: 'bundle swagger-lrm.json'
+          args: 'bundle swagger-lrm.json -o lrm.html'
+
+      - name: redoc-cli for SI-SAMU interface
+        uses: seeebiii/redoc-cli-github-action@v10
+        with:
+          args: 'bundle swagger-si-samu.json -o si-samu.html'
+
+  commit:
+    runs-on: ubuntu-latest
+    name: Committing docs files
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+      - name: Commit files
+        run: |
+          git config --local user.email "Docs-Generator[bot]@users.noreply.github.com"
+          git config --local user.name "Docs-Generator[bot]"
+          git commit -a -m "🦾 Auto-génération des sites de documentation"
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          branch: ${{ github.head_ref }}
