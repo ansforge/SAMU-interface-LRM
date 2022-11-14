@@ -1,0 +1,23 @@
+name: Documentation Site Builder
+
+on:
+  push:
+    branches:
+      - master
+      - main
+      - test_workflows
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Test
+    steps:
+      # first checkout your code
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      # then use redoc-cli-github-action to generate your HTML bundle
+      - name: redoc-cli
+        uses: seeebiii/redoc-cli-github-action@v10
+        with:
+          args: 'bundle swagger-lrm.json'
