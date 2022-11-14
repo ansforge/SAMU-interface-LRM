@@ -9,7 +9,10 @@ jobs:
     steps:
       # first checkout your code
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
 
       # then use redoc-cli-github-action to generate your HTML bundle
       - name: Generate docs for LRM interface
@@ -22,10 +25,6 @@ jobs:
         with:
           args: 'bundle swagger-si-samu.json -o si-samu.html'
 
-      - uses: actions/checkout@v3
-        with:
-          ref: ${{ github.head_ref }}
-          fetch-depth: 0
       - name: Commit files
         run: |
           git config --local user.email "Docs-Generator[bot]@users.noreply.github.com"
