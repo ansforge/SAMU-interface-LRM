@@ -5,27 +5,23 @@ on: [pull_request, pull_request_target]
 jobs:
   build:
     runs-on: ubuntu-latest
-    name: Generating docs files
+    name: Generate and commit docs site files
     steps:
       # first checkout your code
       - name: Checkout
         uses: actions/checkout@v2
 
       # then use redoc-cli-github-action to generate your HTML bundle
-      - name: redoc-cli for LRM interface
+      - name: Generate docs for LRM interface
         uses: seeebiii/redoc-cli-github-action@v10
         with:
           args: 'bundle swagger-lrm.json -o lrm.html'
 
-      - name: redoc-cli for SI-SAMU interface
+      - name: Generate docs for SI-SAMU interface
         uses: seeebiii/redoc-cli-github-action@v10
         with:
           args: 'bundle swagger-si-samu.json -o si-samu.html'
 
-  commit:
-    runs-on: ubuntu-latest
-    name: Committing docs files
-    steps:
       - uses: actions/checkout@v3
         with:
           ref: ${{ github.head_ref }}
