@@ -25,6 +25,12 @@ jobs:
         with:
           args: 'bundle swagger-si-samu.json -o si-samu.html'
 
+      - name: check result
+        run: |
+          ls -al
+          pwd
+          test -f lrm.html || (echo "Missing lrm.html from previous step." && exit 1)
+
       - name: Commit files
         run: |
           git config --local user.email "Docs-Generator[bot]@users.noreply.github.com"
