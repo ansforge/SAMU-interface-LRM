@@ -1,0 +1,38 @@
+/* Fonts | Ref.: https://ansforge.github.io/DesignSystem/sg-typography.html */
+@font-face {
+    font-family: futura-pt;
+    src: url(fonts/FuturaPTBook.otf);
+    font-weight: 400;
+}
+@font-face {
+    font-family: futura-pt;
+    src: url(fonts/FuturaPTMedium.otf);
+    font-weight: 500;
+}
+@font-face {
+    font-family: futura-pt;
+    src: url(fonts/FuturaPTDemi.otf);
+    font-weight: 600;
+}
+@font-face {
+    font-family: futura-pt-bold;
+    src: url(fonts/FuturaPTBold.otf);
+    font-weight: 700;
+}
+
+/* Style */
+body {
+    height: 100vh;
+    display: grid;
+    align-items: center;
+    justify-content: center;
+}
+
+#cta-container {
+    position: relative;
+    top: -20px;
+}
+
+.cta {
+    margin: 20px;
+}
