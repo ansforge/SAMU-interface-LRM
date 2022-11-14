@@ -15,15 +15,10 @@ jobs:
           fetch-depth: 0
 
       # then use redoc-cli-github-action to generate your HTML bundle
-      - name: Generate docs for LRM interface
+      - name: Generate docs for both interfaces
         uses: seeebiii/redoc-cli-github-action@v10
         with:
-          args: 'bundle swagger-lrm.json -o docs/lrm.html'
-
-      - name: Generate docs for SI-SAMU interface
-        uses: seeebiii/redoc-cli-github-action@v10
-        with:
-          args: 'bundle swagger-si-samu.json -o docs/si-samu.html'
+          args: 'bundle swagger-lrm.json swagger-si-samu.json -o docs/index.html'
 
       - name: Commit files
         run: |
