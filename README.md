@@ -1,5 +1,5 @@
-<h1 align="center">Welcome to Interface LRM - SI-SAMU 👋</h1>
-<p>
+<h1 align="center">Interface LRM - SI-SAMU</h1>
+<p align="center">
   <img alt="Version" src="https://img.shields.io/badge/version-1.2-blue.svg?cacheSeconds=2592000" />
   <a href="https://ansforge.github.io/SAMU-interface-LRM/#LRM" target="_blank">
     <img alt="Documentation" src="https://img.shields.io/badge/documentation-yes-brightgreen.svg" />
@@ -11,27 +11,36 @@
 
 > Interface entre les logiciels de régulation médicale (LRM) et le bandeau téléphonique SI-SAMU
 
-### 🏠 [Homepage](https://ansforge.github.io/SAMU-interface-LRM)
+🏠 [Page d'accueil](https://ansforge.github.io/SAMU-interface-LRM)
 
 ## Usage
 
+Les spécifications sont disponibles dans le dossier [`specs/`](./specs).
+
+Toutes les informations sont disponibles en ligne sur
+la [page web de l'interface](https://ansforge.github.io/SAMU-interface-LRM).
+
+Pour afficher le site localement, veuillez lancer les commandes suivantes :
+
 ```sh
-Usage instructions
+cd docs
+python -m http.server
 ```
 
-## Author
+## Auteur
 
 👤 **SI-SAMU**
 
-* Website: https://esante.gouv.fr/si-samu
+* Site web : https://esante.gouv.fr/si-samu
 
-## 🤝 Contributing
+## 🤝 Contribuer
 
-Contributions, issues and feature requests are welcome!<br />Feel free to check [issues page](https://github.com/ansforge/SAMU-interface-LRM/issues). 
+Les contributions, *issues* & *pull requests* sont les bienvenues !
+<br />N'hésitez pas à utiliser notre [page d'*issues*](https://github.com/ansforge/SAMU-interface-LRM/issues).
 
-## Show your support
+## Montrez votre support
 
-Give a ⭐️ if this project helped you!
+Mettez une ⭐️ si ce projet vous a aidé !
 
 ***
-_This README was generated with ❤️ by [readme-md-generator](https://github.com/kefranabg/readme-md-generator)_
+_Ce README est inspiré de [readme-md-generator](https://github.com/kefranabg/readme-md-generator)_
