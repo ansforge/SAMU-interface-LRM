@@ -18,12 +18,12 @@ jobs:
       - name: Generate docs for LRM interface
         uses: seeebiii/redoc-cli-github-action@v10
         with:
-          args: 'bundle swagger-lrm.json -o docs/lrm.html'
+          args: 'bundle specs/swagger-lrm.json -o docs/lrm.html'
 
       - name: Generate docs for SI-SAMU interface
         uses: seeebiii/redoc-cli-github-action@v10
         with:
-          args: 'bundle swagger-si-samu.json -o docs/si-samu.html'
+          args: 'bundle specs/swagger-si-samu.json -o docs/si-samu.html'
 
       - name: Commit files
         run: |
