@@ -2,3 +2,4 @@
 .vs/
 .vscode/
 *.sublime-workspace
+**/node_modules
