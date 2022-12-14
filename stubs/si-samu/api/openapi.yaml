@@ -1,0 +1,288 @@
+openapi: 3.0.1
+info:
+  description: Endpoints REST exposés par le service de sychronisation du SI-SAMU
+    à destination des LRM externes
+  title: API REST du Service Synchro LRM
+  version: v1
+servers:
+- url: http://localhost:8080/si-samu-back-synchro-lrm-web/api
+- url: https://localhost:8080/si-samu-back-synchro-lrm-web/api
+tags:
+- name: cti
+paths:
+  /v1/cti/{idCrra}/agents/{idNatPs}/calls:
+    post:
+      description: Appel Sortant. Crée un nouvel appel (clickToCall).
+      operationId: creerAppel
+      parameters:
+      - description: Identifiant du CRRA
+        in: path
+        name: idCrra
+        required: true
+        schema:
+          pattern: "^FR[0-9][0-9AB]{2}$"
+          type: string
+      - description: Identifiant de l'agent
+        in: path
+        name: idNatPs
+        required: true
+        schema:
+          maxLength: 32
+          minLength: 1
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DemandeAppelSortant'
+        description: Information de l'appel
+        required: true
+      responses:
+        "202":
+          content: {}
+          description: Accepted
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Bad Request
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Forbidden
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Not Found
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Conflict
+      summary: post
+      tags:
+      - cti
+      x-codegen-request-body-name: demandeAppelSortantDto
+      x-eov-operation-handler: controllers/CtiController
+  /v1/cti/{idCrra}/dossiers/{idDossier}:
+    put:
+      description: Corrélation d'un dossier à un appel.
+      operationId: correlerDossierAppel
+      parameters:
+      - description: Identifiant du CRRA
+        in: path
+        name: idCrra
+        required: true
+        schema:
+          pattern: "^FR[0-9][0-9AB]{2}$"
+          type: string
+      - description: Identifiant du dossier
+        in: path
+        name: idDossier
+        required: true
+        schema:
+          maxLength: 25
+          minLength: 1
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CorrelationDossier'
+        description: Information du dossier
+        required: true
+      responses:
+        "202":
+          content: {}
+          description: Accepted
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Bad Request
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Forbidden
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Conflict
+      summary: put
+      tags:
+      - cti
+      x-codegen-request-body-name: correlationDossierDto
+      x-eov-operation-handler: controllers/CtiController
+components:
+  schemas:
+    Appelant:
+      description: Information d'un appelant
+      example:
+        adresse: adresse
+        nom: nom
+        prenom: prenom
+      properties:
+        nom:
+          description: Nom de l’appelant
+          maxLength: 32
+          minLength: 0
+          type: string
+        prenom:
+          description: Prénom de l’appelant
+          maxLength: 32
+          minLength: 0
+          type: string
+        adresse:
+          description: Adresse de l’appelant
+          maxLength: 256
+          minLength: 0
+          type: string
+      type: object
+    CorrelationDossier:
+      description: Information pour la correction d'un dossier à un appel
+      example:
+        idNatPs: idNatPs
+        prioriteRegul: prioriteRegul
+        appelant:
+          adresse: adresse
+          nom: nom
+          prenom: prenom
+        idAppel: idAppel
+        localisation: localisation
+        patients:
+        - nomNaissance: nomNaissance
+          motifRecours: motifRecours
+          sexe: M
+          nom: nom
+          prenom: prenom
+          age: P38Y
+          patientRemarquable: true
+        - nomNaissance: nomNaissance
+          motifRecours: motifRecours
+          sexe: M
+          nom: nom
+          prenom: prenom
+          age: P38Y
+          patientRemarquable: true
+      properties:
+        idNatPs:
+          description: Identifiant national de l’agent
+          maxLength: 32
+          minLength: 1
+          type: string
+        idAppel:
+          description: "Identifiant de la communication (interne SI-SAMU). En cas\
+            \ de non présence, le dossier sera associé à l’appel en cours de l’agent."
+          maxLength: 64
+          minLength: 0
+          type: string
+        prioriteRegul:
+          description: Priorité de régulation. Nomenclature SI-SAMU PRIORITE
+          pattern: "P[0-3]|NR"
+          type: string
+        localisation:
+          description: Localisation du dossier (lieu d’intervention)
+          maxLength: 256
+          minLength: 0
+          type: string
+        appelant:
+          $ref: '#/components/schemas/Appelant'
+        patients:
+          description: Liste des patients concernés par le DRM
+          items:
+            $ref: '#/components/schemas/Patient'
+          type: array
+      required:
+      - idNatPs
+      type: object
+    DemandeAppelSortant:
+      description: Information d'une demande d'appel sortant
+      example:
+        idDossier: idDossier
+        numTel: numTel
+      properties:
+        numTel:
+          description: Numéro de téléphone appelé
+          pattern: "^([#\\+\\*]|37000|00+)?[0-9]{2,15}$"
+          type: string
+        idDossier:
+          description: Numéro du dossier en relation avec l’appel
+          maxLength: 25
+          minLength: 0
+          type: string
+      required:
+      - numTel
+      type: object
+    Error:
+      description: Error
+      properties:
+        message:
+          description: message
+          type: string
+        code:
+          description: code
+          type: string
+      type: object
+    Patient:
+      description: Information d'un patient
+      example:
+        nomNaissance: nomNaissance
+        motifRecours: motifRecours
+        sexe: M
+        nom: nom
+        prenom: prenom
+        age: P38Y
+        patientRemarquable: true
+      properties:
+        nom:
+          description: Nom du patient
+          maxLength: 32
+          minLength: 0
+          type: string
+        nomNaissance:
+          description: Nom de naissance du patient
+          maxLength: 32
+          minLength: 0
+          type: string
+        prenom:
+          description: Prénom du patient
+          maxLength: 32
+          minLength: 0
+          type: string
+        sexe:
+          description: Sexe du patient
+          enum:
+          - M
+          - F
+          - O
+          - U
+          maxLength: 1
+          minLength: 0
+          type: string
+        age:
+          description: "Age du patient au format 'durée' ISO-8601 : 'P' suivi de la\
+            \ durée, suivi du type (Y : années, M : mois, D : jours)"
+          example: P38Y
+          pattern: "^P([0-9]{1,3}Y|[0-9]{1,2}M|[0-9]{1,2}D)$"
+          type: string
+        motifRecours:
+          description: Motif de recours patient. Nomenclature SI-SAMU TYPMDR
+          maxLength: 32
+          minLength: 0
+          type: string
+        patientRemarquable:
+          description: Patient remarquable.
+          type: boolean
+      type: object
+x-original-swagger-version: "2.0"
