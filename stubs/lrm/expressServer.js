@@ -11,6 +11,7 @@ const bodyParser = require('body-parser');
 const OpenApiValidator = require('express-openapi-validator');
 const logger = require('./logger');
 const config = require('./config');
+const interceptor = require('express-interceptor');
 
 class ExpressServer {
     constructor(port, openApiYaml) {
@@ -46,12 +47,37 @@ class ExpressServer {
             res.status(200);
             res.json(req.query);
         });
+        // Send back info from backend to client using long polling
+        // 1. Create long polling endpoint
+        const longPoll = require("express-longpoll")(this.app)
+        longPoll.create("/poll");
+
+        // 2. Intercept all responses (to server-server calls) and send them to the client through long polling endpoint
+        const finalLongPollingInterceptor = interceptor(function (req, res) {
+            return {
+                isInterceptable: () => true,
+                // Sends response to the client through long polling endpoint
+                intercept: function (body, send) {
+                    const data = {
+                        code: res.statusCode,
+                        body
+                    };
+                    console.log(data);
+                    longPoll.publish("/poll", data);
+                    send(body);
+                }
+            };
+        })
+        // Add the interceptor middleware
+        this.app.use(finalLongPollingInterceptor);
     }
 
     launch() {
         this.app.use(
             OpenApiValidator.middleware({
                 apiSpec: this.openApiPath,
+                // Automatic mapping of OpenAPI endpoints to Express handler functions
+                // Ref.: https://github.com/cdimascio/express-openapi-validator/wiki/Documentation#example-express-api-server-with-operationhandlers
                 operationHandlers: path.join(__dirname),
                 fileUploader: {dest: config.FILE_UPLOAD_PATH},
             })
