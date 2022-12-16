@@ -12,6 +12,7 @@ const OpenApiValidator = require('express-openapi-validator');
 const logger = require('./logger');
 const config = require('./config');
 const interceptor = require('express-interceptor');
+const axios = require('axios');
 
 class ExpressServer {
     constructor(port, openApiYaml) {
@@ -47,6 +48,18 @@ class ExpressServer {
             res.status(200);
             res.json(req.query);
         });
+
+        // Forward UI request to SI-SAMU backend
+        this.app.use('/forward', async (req, res) => {
+            let response;
+            if (req.method === "POST") {
+                response = await axios.post(req.body.endpoint, req.body.data)
+            } else if (req.method === "PUT") {
+                response = await axios.put(req.body.endpoint, req.body.data)
+            }
+            res.json(response.data)
+        })
+
         // Send back info from backend to client using long polling
         // 1. Create long polling endpoint
         const longPoll = require("express-longpoll")(this.app, {DEBUG: true});
