@@ -49,8 +49,8 @@ class ExpressServer {
         });
         // Send back info from backend to client using long polling
         // 1. Create long polling endpoint
-        const longPoll = require("express-longpoll")(this.app)
-        longPoll.create("/poll");
+        const longPoll = require("express-longpoll")(this.app, {DEBUG: true});
+        longPoll.create("/poll", {maxListeners: 100});
 
         // 2. Intercept all responses (to server-server calls) and send them to the client through long polling endpoint
         const finalLongPollingInterceptor = interceptor(function (req, res) {
@@ -58,9 +58,11 @@ class ExpressServer {
                 isInterceptable: () => true,
                 // Sends response to the client through long polling endpoint
                 intercept: function (body, send) {
+                    const d = new Date();
                     const data = {
                         endpoint: req.originalUrl,
                         code: res.statusCode,
+                        time: d.getHours() + ':' + d.getMinutes() + ':' + d.getMilliseconds(),
                         body
                     };
                     console.log(data);
