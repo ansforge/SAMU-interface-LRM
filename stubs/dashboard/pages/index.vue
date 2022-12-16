@@ -134,7 +134,7 @@ export default {
   },
   methods: {
     async longPolling() {
-      this.$axios.$get('http://localhost:8081/poll', {timeout: 10000}).then((response) => {
+      this.$axios.$get('/poll', {timeout: 10000}).then((response) => {
         try {
           response.body = JSON.parse(response.body);
         } catch (e) {
@@ -159,7 +159,7 @@ export default {
       const time = this.time();
       // Could be using Swagger generated client, but it would validate fields!
       this.$axios.$post(
-        'http://localhost:8081/forward',
+        '/forward',
         {
           endpoint: this.form.core.urlSiSamu + endpoint,
           data: this.form.clickToCall
