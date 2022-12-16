@@ -1,9 +1,10 @@
 {
-  "name":  "api-rest-du-service-synchro-lrm",
+  "name": "api-rest-du-service-synchro-lrm",
   "version": "v1",
   "description": "Endpoints REST exposés par le service de sychronisation du SI-SAMU à destination des LRM externes",
   "main": "index.js",
   "scripts": {
+    "dev": "nodemon index.js",
     "prestart": "npm install",
     "start": "node index.js"
   },
@@ -19,7 +20,9 @@
     "cookie-parser": "^1.4.4",
     "cors": "^2.8.5",
     "express": "^4.16.4",
-    "express-openapi-validator": "^3.9.1",
+    "express-interceptor": "^1.2.0",
+    "express-longpoll": "^0.0.6",
+    "express-openapi-validator": "^5.0.0",
     "js-yaml": "^3.3.0",
     "ono": "^5.0.1",
     "openapi-sampler": "^1.0.0-beta.15",
@@ -33,7 +36,8 @@
     "eslint": "^5.16.0",
     "eslint-config-airbnb-base": "^14.0.0",
     "eslint-plugin-import": "^2.17.2",
-    "mocha": "^7.1.1"
+    "mocha": "^7.1.1",
+    "nodemon": "^2.0.20"
   },
   "eslintConfig": {
     "env": {
