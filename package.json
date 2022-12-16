@@ -1,0 +1,22 @@
+{
+  "name": "samu-interface-lrm",
+  "version": "1.2.0",
+  "description": "<h1 align=\"center\">Interface LRM - SI-SAMU</h1> <p align=\"center\">   <img alt=\"Version\" src=\"https://img.shields.io/badge/version-1.2-blue.svg?cacheSeconds=2592000\" />   <a href=\"https://ansforge.github.io/SAMU-interface-LRM/#LRM\" target=\"_blank\">     <img alt=\"Documentation\" src=\"https://img.shields.io/badge/documentation-yes-brightgreen.svg\" />   </a>   <a href=\"#\" target=\"_blank\">     <img alt=\"License: MIT\" src=\"https://img.shields.io/badge/License-MIT-yellow.svg\" />   </a> </p>",
+  "main": "stubs/lrm/index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ansforge/SAMU-interface-LRM.git"
+  },
+  "author": "ANS > SI-SAMU > Romain Fouilland",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ansforge/SAMU-interface-LRM/issues"
+  },
+  "homepage": "https://github.com/ansforge/SAMU-interface-LRM#readme"
+}
