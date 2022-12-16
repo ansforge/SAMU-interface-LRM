@@ -11,12 +11,13 @@
           <v-form>
             <v-row>
               <v-col>
-                <v-text-field
+                <v-combobox
                   v-model="form.core.urlSiSamu"
+                  :items="items.core.urlSiSamu"
                   label="URL SI-SAMU"
                   hide-details="auto"
                   required
-                ></v-text-field>
+                ></v-combobox>
               </v-col>
             </v-row>
             <v-row>
@@ -24,22 +25,24 @@
                 cols="12"
                 md="6"
               >
-                <v-text-field
+                <v-combobox
                   v-model="form.core.idCrra"
+                  :items="items.core.idCrra"
                   label="idCrra"
                   required
-                ></v-text-field>
+                ></v-combobox>
               </v-col>
 
               <v-col
                 cols="12"
                 md="6"
               >
-                <v-text-field
+                <v-combobox
                   v-model="form.core.idNatPs"
+                  :items="items.core.idNatPs"
                   label="idNatPs"
                   required
-                ></v-text-field>
+                ></v-combobox>
               </v-col>
             </v-row>
           </v-form>
@@ -51,22 +54,24 @@
                 cols="12"
                 md="6"
               >
-                <v-text-field
+                <v-combobox
                   v-model="form.clickToCall.numTel"
+                  :items="items.clickToCall.numTel"
                   label="N° de téléphone"
                   required
-                ></v-text-field>
+                ></v-combobox>
               </v-col>
 
               <v-col
                 cols="12"
                 md="6"
               >
-                <v-text-field
+                <v-combobox
                   v-model="form.clickToCall.idDossier"
+                  :items="items.clickToCall.idDossier"
                   label="idDossier"
                   required
-                ></v-text-field>
+                ></v-combobox>
               </v-col>
             </v-row>
             <v-card-actions>
@@ -116,10 +121,21 @@ export default {
         code: 200,
         body: {body: 'Page loaded successfully!'}
       }],
+      items: {
+        core: {
+          urlSiSamu: ['http://localhost:8080', 'https://portail.vft.si-samu.fr'],
+          idCrra: ['FR090', 'FR42A'],
+          idNatPs: ['899700367800']
+        },
+        clickToCall: {
+          numTel: ['0604174184'],
+          idDossier: ['22298003']
+        }
+      },
       form: {
         core: {
           urlSiSamu: 'http://localhost:8080',
-          idCrra: 'FR42A',
+          idCrra: 'FR090',
           idNatPs: '899700367800'
         },
         clickToCall: {
