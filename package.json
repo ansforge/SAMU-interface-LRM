@@ -10,7 +10,9 @@
     "doc": "docs"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "heroku-prebuild": "cd stubs/dashboard && npm install && npm run generate && cp -R dist/. ../lrm/ui",
+    "build": "cd stubs/lrm && npm install",
+    "start": "cd stubs/lrm && npm start"
   },
   "repository": {
     "type": "git",
