@@ -55,12 +55,17 @@ class ExpressServer {
         // Forward UI request to SI-SAMU backend
         this.app.use('/forward', async (req, res) => {
             let response;
-            if (req.method === "POST") {
-                response = await axios.post(req.body.endpoint, req.body.data)
-            } else if (req.method === "PUT") {
-                response = await axios.put(req.body.endpoint, req.body.data)
+            try {
+                if (req.method === "POST") {
+                    response = await axios.post(req.body.endpoint, req.body.data);
+                } else if (req.method === "PUT") {
+                    response = await axios.put(req.body.endpoint, req.body.data);
+                }
+                res.json(response.data)
+            } catch (e) {
+                logger.error(e);
+                res.status(500).send(e.toJSON());
             }
-            res.json(response.data)
         })
 
         // Send back info from backend to client using long polling
