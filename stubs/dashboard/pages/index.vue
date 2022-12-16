@@ -4,9 +4,78 @@
       <v-card>
         <v-card-title class="headline">Formulaire</v-card-title>
         <v-card-text>
-          <v-alert type="info">
-            This is the dashboard page. You can find it in <code>resources/js/stubs/dashboard/pages/index.vue</code>
+          <v-alert type="info" dense class="mb-0">
+            Ce formulaire permet d'envoyer des requêtes vers le bandeau
           </v-alert>
+          <v-card-title>Infos cœur</v-card-title>
+          <v-form>
+            <v-row>
+              <v-col>
+                <v-text-field
+                  v-model="form.core.urlSiSamu"
+                  label="URL SI-SAMU"
+                  hide-details="auto"
+                  required
+                ></v-text-field>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col
+                cols="12"
+                md="6"
+              >
+                <v-text-field
+                  v-model="form.core.idCrra"
+                  label="idCrra"
+                  required
+                ></v-text-field>
+              </v-col>
+
+              <v-col
+                cols="12"
+                md="6"
+              >
+                <v-text-field
+                  v-model="form.core.idNatPs"
+                  label="idNatPs"
+                  required
+                ></v-text-field>
+              </v-col>
+            </v-row>
+          </v-form>
+          <v-divider/>
+          <v-card-title>Click-to-Call</v-card-title>
+          <v-form>
+            <v-row>
+              <v-col
+                cols="12"
+                md="6"
+              >
+                <v-text-field
+                  v-model="form.clickToCall.numTel"
+                  label="N° de téléphone"
+                  required
+                ></v-text-field>
+              </v-col>
+
+              <v-col
+                cols="12"
+                md="6"
+              >
+                <v-text-field
+                  v-model="form.clickToCall.idDossier"
+                  label="idDossier"
+                  required
+                ></v-text-field>
+              </v-col>
+            </v-row>
+            <v-card-actions>
+              <v-spacer/>
+              <v-btn color="primary" @click="submitClickToCall">
+                Envoyer
+              </v-btn>
+            </v-card-actions>
+          </v-form>
         </v-card-text>
       </v-card>
     </v-col>
@@ -18,11 +87,11 @@
         </v-card-title>
         <v-card-text>
           <transition-group name="message">
-            <div v-for="{endpoint, time, receivedTime, code, body} in messages" :key="time"
+            <div v-for="{direction, endpoint, time, receivedTime, code, body} in messages" :key="time"
                  class="message mb-4">
               <v-badge :color="code === 200 ? 'green' : 'red'" :content="code"></v-badge>
               <pre style="white-space: pre-wrap; background-color: rgba(0, 0, 0, 0.05);"
-                   class="elevation-1 pa-2 mt-n3">-> {{ endpoint }}<br>{{ time }} -> {{ receivedTime }}<br>{{
+                   class="elevation-1 pa-2 mt-n3">{{ direction }}{{ endpoint }}<br>{{ time }} -> {{ receivedTime }}<br>{{
                   body
                 }}</pre>
             </div>
@@ -40,12 +109,24 @@ export default {
   data() {
     return {
       messages: [{
+        direction: '→ ',
         endpoint: '/',
         time: this.time(),
         receivedTime: this.time(),
         code: 200,
         body: {body: 'Page loaded successfully!'}
-      }]
+      }],
+      form: {
+        core: {
+          urlSiSamu: 'http://localhost:8080',
+          idCrra: 'FR42A',
+          idNatPs: '899700367800'
+        },
+        clickToCall: {
+          numTel: '0606060606',
+          idDossier: '22298003'
+        }
+      }
     }
   },
   mounted() {
@@ -60,6 +141,7 @@ export default {
         }
         this.messages.unshift({
           ...response,
+          direction: '→ ',
           receivedTime: this.time()
         });
         this.longPolling();
@@ -71,6 +153,37 @@ export default {
     time() {
       const d = new Date();
       return d.getHours() + ':' + d.getMinutes() + ':' + d.getMilliseconds();
+    },
+    submitClickToCall() {
+      const endpoint = '/si-samu-back-synchro-lrm-web/api/v1/cti/' + this.form.core.idCrra + '/agents/' + this.form.core.idNatPs + '/calls';
+      const time = this.time();
+      // Could be using Swagger generated client, but it would validate fields!
+      this.$axios.$post(
+        'http://localhost:8081/forward',
+        {
+          endpoint: this.form.core.urlSiSamu + endpoint,
+          data: this.form.clickToCall
+        }
+      ).then((response) => {
+        console.log(response);
+        this.messages.unshift({
+          direction: '← ',
+          endpoint,
+          time,
+          receivedTime: this.time(),
+          code: 200,
+          body: response
+        });
+      }).catch(error => {
+        this.messages.unshift({
+          direction: '← ',
+          endpoint,
+          time,
+          receivedTime: this.time(),
+          code: error.response.status,
+          body: error.response.data
+        });
+      })
     }
   }
 }
