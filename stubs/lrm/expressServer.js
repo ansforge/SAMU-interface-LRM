@@ -59,6 +59,7 @@ class ExpressServer {
                 // Sends response to the client through long polling endpoint
                 intercept: function (body, send) {
                     const data = {
+                        endpoint: req.originalUrl,
                         code: res.statusCode,
                         body
                     };
