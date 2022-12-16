@@ -13,6 +13,16 @@ const logger = require('./logger');
 const config = require('./config');
 const interceptor = require('express-interceptor');
 const axios = require('axios');
+const https = require('https');
+
+// Ref.: https://smallstep.com/hello-mtls/doc/combined/nodejs/axios
+const httpsAgent = new https.Agent({
+    // Needed to allow self-signed certificates | Ref.: https://stackoverflow.com/a/54903835/10115198
+    rejectUnauthorized: false,
+    cert: fs.readFileSync('certs/certif.crt'),
+    key: fs.readFileSync('certs/certif.key'),
+    // ca: fs.readFileSync('certs/ACI-EL-ORG-TEST.crt'),
+});
 
 class ExpressServer {
     constructor(port, openApiYaml) {
@@ -57,14 +67,18 @@ class ExpressServer {
             let response;
             try {
                 if (req.method === "POST") {
-                    response = await axios.post(req.body.endpoint, req.body.data);
+                    response = await axios.post(req.body.endpoint, req.body.data, {httpsAgent});
                 } else if (req.method === "PUT") {
-                    response = await axios.put(req.body.endpoint, req.body.data);
+                    response = await axios.put(req.body.endpoint, req.body.data, {httpsAgent});
                 }
                 res.json(response.data)
-            } catch (e) {
-                logger.error(e);
-                res.status(500).send(e.toJSON());
+            } catch (err) {
+                try {
+                    res.status(500).send(err.toJSON());
+                } catch (subErr) {
+                    // Handling "TypeError: Converting circular structure to JSON"
+                    res.status(500).send({error: err.message, secondError: subErr.message});
+                }
             }
         })
 
