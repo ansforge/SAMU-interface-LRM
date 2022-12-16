@@ -49,6 +49,9 @@ class ExpressServer {
             res.json(req.query);
         });
 
+        // Serve distribution UI
+        this.app.use('/ui', express.static(path.join(__dirname, 'ui')))
+
         // Forward UI request to SI-SAMU backend
         this.app.use('/forward', async (req, res) => {
             let response;
