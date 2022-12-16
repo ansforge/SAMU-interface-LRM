@@ -1,1 +1,1 @@
-web: cd stubs/dashboard && ls && npm install && ls && ls node_modules && npm run generate && cp -R dist/. ../lrm/ui && cd ../lrm && npm install && npm run start
+web: node --version && cd stubs/dashboard && ls && npm install --production=false && ls && ls node_modules && npm run generate && cp -R dist/. ../lrm/ui && cd ../lrm && npm install --production=false && npm run start
