@@ -1,6 +1,6 @@
 <template>
   <v-row justify="center">
-    <v-col cols="12" sm="8" md="6">
+    <v-col cols="12" md="7">
       <v-card>
         <v-card-title class="headline">Formulaire</v-card-title>
         <v-card-text>
@@ -12,11 +12,11 @@
             <v-row>
               <v-col>
                 <v-combobox
-                  v-model="form.core.urlSiSamu"
-                  :items="items.core.urlSiSamu"
+                  v-model="form.urlSiSamu"
+                  :items="items.urlSiSamu"
                   label="URL SI-SAMU"
                   hide-details="auto"
-                  required
+                  dense
                 ></v-combobox>
               </v-col>
             </v-row>
@@ -26,10 +26,10 @@
                 md="6"
               >
                 <v-combobox
-                  v-model="form.core.idCrra"
-                  :items="items.core.idCrra"
+                  v-model="form.idCrra"
+                  :items="items.idCrra"
                   label="idCrra"
-                  required
+                  dense
                 ></v-combobox>
               </v-col>
 
@@ -38,53 +38,29 @@
                 md="6"
               >
                 <v-combobox
-                  v-model="form.core.idNatPs"
-                  :items="items.core.idNatPs"
+                  v-model="form.idNatPs"
+                  :items="items.idNatPs"
                   label="idNatPs"
-                  required
+                  dense
                 ></v-combobox>
               </v-col>
             </v-row>
           </v-form>
-          <v-divider/>
-          <v-card-title>Click-to-Call</v-card-title>
-          <v-form>
-            <v-row>
-              <v-col
-                cols="12"
-                md="6"
-              >
-                <v-combobox
-                  v-model="form.clickToCall.numTel"
-                  :items="items.clickToCall.numTel"
-                  label="N° de téléphone"
-                  required
-                ></v-combobox>
-              </v-col>
-
-              <v-col
-                cols="12"
-                md="6"
-              >
-                <v-combobox
-                  v-model="form.clickToCall.idDossier"
-                  :items="items.clickToCall.idDossier"
-                  label="idDossier"
-                  required
-                ></v-combobox>
-              </v-col>
-            </v-row>
-            <v-card-actions>
-              <v-spacer/>
-              <v-btn color="primary" @click="submitClickToCall">
-                Envoyer
-              </v-btn>
-            </v-card-actions>
-          </v-form>
+          <RequestForm
+            v-if="swagger"
+            v-for="(requestInfos, request) in requests"
+            :key="request"
+            :swagger="swagger"
+            :completeForm="form"
+            :requestInfos="requestInfos"
+            :items="items"
+            v-model="form"
+            @submit="submit(request)"
+          />
         </v-card-text>
       </v-card>
     </v-col>
-    <v-col cols="12" sm="8" md="6">
+    <v-col cols="12" md="5">
       <v-card>
         <v-card-title class="headline">
           Messages
@@ -113,6 +89,7 @@ export default {
   name: 'IndexPage',
   data() {
     return {
+      swagger: null,
       messages: [{
         direction: '→ ',
         endpoint: '/',
@@ -121,31 +98,70 @@ export default {
         code: 200,
         body: {body: 'Page loaded successfully!'}
       }],
-      items: {
-        core: {
-          urlSiSamu: ['http://localhost:8080', 'https://portail.vft.si-samu.fr'],
-          idCrra: ['FR090', 'FR42A'],
-          idNatPs: ['899700367800']
-        },
+      requests: {
         clickToCall: {
-          numTel: ['0604174184'],
-          idDossier: ['22298003']
+          name: 'Click-to-Call',
+          properties: []
+        },
+        correlation: {
+          name: 'Corrélation',
+          properties: []
+        },
+      },
+      items: {
+        urlSiSamu: ['http://localhost:8080', 'https://portail.vft.si-samu.fr'],
+        idCrra: ['FR090', 'FR42A'],
+        idNatPs: ['899700367800', '1234'],
+        numTel: ['0604174184'],
+        idDossier: ['22298003', 'idDossier'],
+        idAppel: ['interne-SI-SAMU'],
+        idFlux: ['FR090-FluxStd-MU-P0-F02'],
+        prioriteRegul: ['PO', 'P1', 'P2', 'NR'],
+        localisation: ['PariSanté Campus', 'Tour Pitard'],
+        appelant: {
+          nom: ['Appelant'],
+          prenom: ['Jean'],
+          adresse: ['1 rue de la paix']
+        },
+        patients: {
+          nom: ['Patient'],
+          nomNaissance: ['Patient Bébé'],
+          prenom: ['Michel'],
+          sexe: ['M', 'F', 'O', 'U'],
+          age: ['P75Y'],
+          motifRecours: ['Motif Recours', 'AUTCHUTE']
         }
       },
       form: {
-        core: {
-          urlSiSamu: 'http://localhost:8080',
-          idCrra: 'FR090',
-          idNatPs: '899700367800'
-        },
-        clickToCall: {
-          numTel: '0606060606',
-          idDossier: '22298003'
+        urlSiSamu: 'http://localhost:8080',
+        idCrra: 'FR090',
+        idNatPs: '899700367800',
+        numTel: '0606060606',
+        idDossier: '22298003',
+        idAppel: 'interne-SI-SAMU',
+        idFlux: 'FR090-FluxStd-MU-P0-F02',
+        prioriteRegul: 'P2',
+        localisation: 'PariSanté Campus',
+        appelant: {
+          nom: 'Appelant',
+          prenom: 'Jean',
+          adresse: '1 rue de la paix'
         }
       }
     }
   },
   mounted() {
+    // To automatically generate the UI and input fields based on the swagger
+    fetch('/swagger-si-samu.json')
+      .then((response) => response.json())
+      .then((swagger) => {
+        this.swagger = swagger;
+        console.log(swagger);
+        // Collecting properties for each request
+        this.requests.clickToCall.properties = swagger.definitions.DemandeAppelSortant.properties;
+        this.requests.correlation.properties = swagger.definitions.CorrelationDossier.properties;
+      });
+    // Start listening to server events
     this.longPolling();
   },
   methods: {
@@ -170,15 +186,31 @@ export default {
       const d = new Date();
       return d.getHours() + ':' + d.getMinutes() + ':' + d.getMilliseconds();
     },
-    submitClickToCall() {
-      const endpoint = '/si-samu-back-synchro-lrm-web/api/v1/cti/' + this.form.core.idCrra + '/agents/' + this.form.core.idNatPs + '/calls';
+    getSpecificValues(request) {
+      return Object.fromEntries(
+        Object.keys(this.requests[request].properties)
+          .filter(key => key in this.form)
+          .map(key => [key, this.form[key]])
+      );
+    },
+    submit(request) {
+      let endpoint, caller;
+      if (request === 'clickToCall') {
+        endpoint = '/si-samu-back-synchro-lrm-web/api/v1/cti/' + this.form.idCrra + '/agents/' + this.form.idNatPs + '/calls';
+        caller = this.$axios.$post;
+      } else if (request === 'correlation') {
+        endpoint = '/si-samu-back-synchro-lrm-web/api/v1/cti/' + this.form.idCrra + '/dossiers/' + this.form.idDossier;
+        caller = this.$axios.$put;
+      } else {
+        console.error('Unknown request', request);
+      }
       const time = this.time();
       // Could be using Swagger generated client, but it would validate fields!
-      this.$axios.$post(
+      caller(
         '/forward',
         {
-          endpoint: this.form.core.urlSiSamu + endpoint,
-          data: this.form.clickToCall
+          endpoint: this.form.urlSiSamu + endpoint,
+          data: this.getSpecificValues(request)
         }
       ).then((response) => {
         console.log(response);

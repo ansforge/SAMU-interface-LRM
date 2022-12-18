@@ -10,7 +10,7 @@
     "doc": "docs"
   },
   "scripts": {
-    "heroku-prebuild": "cd stubs/dashboard && npm install --production=false && npm run generate && cp -R dist/. ../lrm/ui",
+    "heroku-prebuild": "cd stubs/dashboard && npm install --production=false && npm run setup && npm run generate && cp -R dist/. ../lrm/ui",
     "build": "cd stubs/lrm && npm install",
     "start": "cd stubs/lrm && npm start"
   },
