@@ -152,7 +152,7 @@ export default {
   },
   mounted() {
     // To automatically generate the UI and input fields based on the swagger
-    fetch('/swagger-si-samu.json')
+    fetch('swagger-si-samu.json')
       .then((response) => response.json())
       .then((swagger) => {
         this.swagger = swagger;
