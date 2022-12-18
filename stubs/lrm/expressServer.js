@@ -74,11 +74,14 @@ class ExpressServer {
                 res.json(response.data)
             } catch (err) {
                 try {
-                    res.status(err.response.status).send({
+                    const data = {
                         message: err.message,
                         data: err.response.data
-                    });
+                    };
+                    console.error(data);
+                    res.status(err.response.status).send(data);
                 } catch (subErr) {
+                    console.error({error: err.message, secondError: subErr.message});
                     // Handling "TypeError: Converting circular structure to JSON"
                     res.status(500).send({error: err.message, secondError: subErr.message});
                 }
