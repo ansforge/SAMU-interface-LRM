@@ -1,7 +1,7 @@
 <template>
   <v-row justify="center">
     <v-col cols="12" md="7">
-      <v-card>
+      <v-card style="height: 86vh; overflow-y: auto;">
         <v-card-title class="headline">Formulaire</v-card-title>
         <v-card-text>
           <v-alert type="info" dense class="mb-0">
@@ -62,7 +62,7 @@
       </v-card>
     </v-col>
     <v-col cols="12" md="5">
-      <v-card>
+      <v-card style="height: 86vh; overflow-y: auto;">
         <v-card-title class="headline">
           Messages
           <v-badge :content="messages.length"/>
