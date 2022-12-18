@@ -62,7 +62,7 @@ class ExpressServer {
                     const data = {
                         endpoint: req.originalUrl,
                         code: res.statusCode,
-                        time: d.getHours() + ':' + d.getMinutes() + ':' + d.getMilliseconds(),
+                        time: d.toLocaleTimeString().replace(':', 'h') + '.' + d.getMilliseconds(),
                         body
                     };
                     console.log(data);

@@ -187,7 +187,7 @@ export default {
     },
     time() {
       const d = new Date();
-      return d.getHours() + ':' + d.getMinutes() + ':' + d.getMilliseconds();
+      return d.toLocaleTimeString().replace(':', 'h') + '.' + d.getMilliseconds();
     },
     getSpecificValues(request) {
       return Object.fromEntries(
