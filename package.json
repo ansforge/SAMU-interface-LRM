@@ -12,7 +12,8 @@
   "scripts": {
     "heroku-prebuild": "cd stubs/dashboard && npm install --production=false && npm run setup && npm run generate && cp -R dist/. ../lrm/ui",
     "build": "cd stubs/lrm && npm install",
-    "start": "cd stubs/lrm && npm start"
+    "start": "cd stubs/lrm && npm start",
+    "deploy": "git checkout heroku && git merge main --no-edit && git push heroku heroku:main && git checkout main"
   },
   "repository": {
     "type": "git",

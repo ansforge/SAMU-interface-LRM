@@ -25,5 +25,5 @@ cd stubs/si-samu && npm install && npm run dev
 
 ## Deployment
 
-The LRM stub is deployed on Heroku -> [UI](https://interface-tester.herokuapp.com/ui/) and serves a Nuxt SSG version of
-the UI.
+The LRM stub is deployed on Heroku and serves a Nuxt SSG version of
+the UI -> [https://interface-tester.herokuapp.com/ui/](https://interface-tester.herokuapp.com/ui/).
