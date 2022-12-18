@@ -64,7 +64,16 @@
       </v-row>
       <v-card-actions v-if="!nested">
         <v-spacer/>
+        <v-btn @click="$emit('save')">
+          <v-icon left>
+            {{ requestInfos.justCopiedToClipboard ? 'mdi-clipboard-check-outline' : 'mdi-clipboard-outline' }}
+          </v-icon>
+          Enregistrer
+        </v-btn>
         <v-btn color="primary" @click="$emit('submit')">
+          <v-icon left>
+            mdi-send
+          </v-icon>
           Envoyer
         </v-btn>
       </v-card-actions>

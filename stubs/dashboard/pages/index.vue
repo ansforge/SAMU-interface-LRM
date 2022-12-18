@@ -56,6 +56,7 @@
             :items="items"
             v-model="form"
             @submit="submit(request)"
+            @save="save(request)"
           />
         </v-card-text>
       </v-card>
@@ -101,15 +102,17 @@ export default {
       requests: {
         clickToCall: {
           name: 'Click-to-Call',
-          properties: []
+          properties: [],
+          justCopiedToClipboard: false
         },
         correlation: {
           name: 'Corrélation',
-          properties: []
+          properties: [],
+          justCopiedToClipboard: false
         },
       },
       items: {
-        urlSiSamu: ['http://localhost:8080', 'https://portail.vft.si-samu.fr'],
+        urlSiSamu: ['http://localhost:8080', 'https://www.portail.vft.si-samu.fr'],
         idCrra: ['FR090', 'FR42A'],
         idNatPs: ['899700367800', '1234'],
         numTel: ['0604174184'],
@@ -193,25 +196,45 @@ export default {
           .map(key => [key, this.form[key]])
       );
     },
-    submit(request) {
-      let endpoint, caller;
+    getCallData(request) {
+      let endpoint, caller, method;
       if (request === 'clickToCall') {
         endpoint = '/si-samu-back-synchro-lrm-web/api/v1/cti/' + this.form.idCrra + '/agents/' + this.form.idNatPs + '/calls';
         caller = this.$axios.$post;
+        method = 'POST'
       } else if (request === 'correlation') {
         endpoint = '/si-samu-back-synchro-lrm-web/api/v1/cti/' + this.form.idCrra + '/dossiers/' + this.form.idDossier;
         caller = this.$axios.$put;
+        method = 'PUT';
       } else {
         console.error('Unknown request', request);
       }
+      return {
+        caller,
+        method,
+        endpoint: this.form.urlSiSamu + endpoint,
+        data: this.getSpecificValues(request)
+      };
+    },
+    save(request) {
+      const {method, endpoint, data} = this.getCallData(request);
+      const curlRequest = `curl --key certif.key --cert certif.crt -v \\
+                    -X ${method} -k -H 'Content-Type: application/json' \\
+                    -i '${endpoint}' --data '${JSON.stringify(data)}'`;
+      console.log(curlRequest);
+      // Copy to clipboard
+      navigator.clipboard.writeText(curlRequest);
+      // Toggle copied icon
+      this.requests[request].justCopiedToClipboard = true;
+      setTimeout(() => this.requests[request].justCopiedToClipboard = false, 1000);
+    },
+    submit(request) {
+      const {caller, endpoint, data} = this.getCallData(request);
       const time = this.time();
       // Could be using Swagger generated client, but it would validate fields!
       caller(
         '/forward',
-        {
-          endpoint: this.form.urlSiSamu + endpoint,
-          data: this.getSpecificValues(request)
-        }
+        {endpoint, data}
       ).then((response) => {
         console.log(response);
         this.messages.unshift({
