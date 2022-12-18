@@ -5,7 +5,7 @@
         <v-card-title class="headline">Formulaire</v-card-title>
         <v-card-text>
           <v-alert type="info" dense class="mb-0">
-            Ce formulaire permet d'envoyer des requêtes vers le bandeau
+            Ce formulaire permet d'envoyer des requêtes vers le bandeau SI-SAMU
           </v-alert>
           <v-card-title>Infos cœur</v-card-title>
           <v-form>
@@ -88,6 +88,11 @@
 <script>
 export default {
   name: 'IndexPage',
+  head() {
+    return {
+      title: 'Interface SI-SAMU tester',
+    }
+  },
   data() {
     return {
       swagger: null,
