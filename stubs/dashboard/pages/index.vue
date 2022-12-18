@@ -131,12 +131,12 @@ export default {
           nomNaissance: ['Patient Bébé'],
           prenom: ['Michel'],
           sexe: ['M', 'F', 'O', 'U'],
-          age: ['P75Y'],
+          age: ['P75Y', 'P9M'],
           motifRecours: ['Motif Recours', 'AUTCHUTE']
         }
       },
       form: {
-        urlSiSamu: 'http://localhost:8080',
+        urlSiSamu: 'https://www.portail.vft.si-samu.fr',
         idCrra: 'FR090',
         idNatPs: '899700367800',
         numTel: '0606060606',
