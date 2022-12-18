@@ -74,7 +74,10 @@ class ExpressServer {
                 res.json(response.data)
             } catch (err) {
                 try {
-                    res.status(500).send(err.toJSON());
+                    res.status(err.response.status).send({
+                        message: err.message,
+                        data: err.response.data
+                    });
                 } catch (subErr) {
                     // Handling "TypeError: Converting circular structure to JSON"
                     res.status(500).send({error: err.message, secondError: subErr.message});
