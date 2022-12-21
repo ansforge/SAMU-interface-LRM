@@ -135,7 +135,7 @@ export default {
       items: {
         urlSiSamu: ['http://localhost:8080', 'https://www.portail.vft.si-samu.fr'],
         idCrra: ['FR090', 'FR42A'],
-        idNatPs: ['899700367800', '1234'],
+        idNatPs: ['00B9814506', '1234'],
         numTel: ['0604174184'],
         idDossier: ['22298003', 'idDossier'],
         idAppel: ['interne-SI-SAMU'],
@@ -159,7 +159,7 @@ export default {
       form: {
         urlSiSamu: 'https://www.portail.vft.si-samu.fr',
         idCrra: 'FR090',
-        idNatPs: '899700367800',
+        idNatPs: '00B9814506',
         numTel: '0606060606',
         idDossier: '22298003',
         idAppel: 'interne-SI-SAMU',
