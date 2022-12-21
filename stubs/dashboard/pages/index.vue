@@ -107,11 +107,13 @@ export default {
       requests: {
         clickToCall: {
           name: 'Click-to-Call',
+          actionName: 'Appeler',
           properties: [],
           justCopiedToClipboard: false
         },
         correlation: {
           name: 'Corrélation',
+          actionName: 'Corréler',
           properties: [],
           justCopiedToClipboard: false
         },

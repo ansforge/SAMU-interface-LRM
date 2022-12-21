@@ -74,7 +74,7 @@
           <v-icon left>
             mdi-send
           </v-icon>
-          Envoyer
+          {{ requestInfos.actionName }}
         </v-btn>
       </v-card-actions>
     </v-form>
