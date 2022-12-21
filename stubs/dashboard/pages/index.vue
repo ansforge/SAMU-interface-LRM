@@ -140,7 +140,7 @@ export default {
         idDossier: ['22298003', 'idDossier'],
         idAppel: ['interne-SI-SAMU'],
         idFlux: ['FR090-FluxStd-MU-P0-F02'],
-        prioriteRegul: ['PO', 'P1', 'P2', 'NR'],
+        prioriteRegul: ['P0', 'P1', 'P2', 'P3', 'NR'],
         localisation: ['PariSanté Campus', 'Tour Pitard'],
         appelant: {
           nom: ['Appelant'],
