@@ -10,7 +10,10 @@
           <v-card-title>Infos cœur</v-card-title>
           <v-form>
             <v-row>
-              <v-col>
+              <v-col
+                cols="12"
+                md="6"
+              >
                 <v-combobox
                   v-model="form.urlSiSamu"
                   :items="items.urlSiSamu"
@@ -19,8 +22,6 @@
                   dense
                 ></v-combobox>
               </v-col>
-            </v-row>
-            <v-row>
               <v-col
                 cols="12"
                 md="6"
@@ -32,7 +33,8 @@
                   dense
                 ></v-combobox>
               </v-col>
-
+            </v-row>
+            <v-row>
               <v-col
                 cols="12"
                 md="6"
@@ -41,6 +43,18 @@
                   v-model="form.idNatPs"
                   :items="items.idNatPs"
                   label="idNatPs"
+                  dense
+                ></v-combobox>
+              </v-col>
+              <v-col
+                cols="12"
+                md="6"
+              >
+                <v-combobox
+                  v-model="form.idDossier"
+                  :items="items.idDossier"
+                  label="idDossier"
+                  hide-details="auto"
                   dense
                 ></v-combobox>
               </v-col>
