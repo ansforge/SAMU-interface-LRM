@@ -133,8 +133,8 @@ export default {
         },
       },
       items: {
-        urlSiSamu: ['http://localhost:8080', 'https://www.portail.vft.si-samu.fr'],
-        idCrra: ['FR090', 'FR42A'],
+        urlSiSamu: ['http://localhost:8080', 'https://www.portail.vft.si-samu.fr', 'https://www.portail.testsutilisateurs.si-samu.fr'],
+        idCrra: ['FR090', 'FR42A', 'FR870'],
         idNatPs: ['00B9814506', '1234'],
         numTel: ['0604174184'],
         idDossier: ['22298003', 'idDossier'],
