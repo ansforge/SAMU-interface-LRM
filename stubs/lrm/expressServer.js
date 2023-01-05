@@ -71,6 +71,7 @@ class ExpressServer {
                 } else if (req.method === "PUT") {
                     response = await axios.put(req.body.endpoint, req.body.data, {httpsAgent});
                 }
+                console.log(response.data);
                 res.json(response.data)
             } catch (err) {
                 try {
