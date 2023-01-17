@@ -176,7 +176,7 @@ components:
       properties:
         numTel:
           description: Numéro de téléphone de l’appelant.
-          pattern: "^([#\\+\\*]|37000)?[0-9]{2,15}$"
+          pattern: "^(([#\\+\\*]|37000)?[0-9]{2,15}|\\*\\*\\*)$"
           type: string
         idAppel:
           description: Identifiant de la communication (interne SI-SAMU)
