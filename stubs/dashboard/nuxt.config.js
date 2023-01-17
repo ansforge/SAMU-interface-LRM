@@ -73,6 +73,11 @@ export default {
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {},
 
+  generate: {
+    // Ignore href links of default.vue | Ref.: https://github.com/nuxt/nuxt.js/issues/8105#issuecomment-706702793
+    exclude: ['/openapi', '/api-docs', '/poll'],
+  },
+
   router: {
     base:
       (process.env.NODE_ENV === 'production' ? '/ui' : '/')
