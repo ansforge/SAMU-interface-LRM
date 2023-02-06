@@ -1,5 +1,4 @@
 // const { Middleware } = require('swagger-express-middleware');
-const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const swaggerUI = require('swagger-ui-express');
@@ -16,13 +15,14 @@ const axios = require('axios');
 const https = require('https');
 
 // Ref.: https://smallstep.com/hello-mtls/doc/combined/nodejs/axios
-const httpsAgent = new https.Agent({
+const options = {
     // Needed to allow self-signed certificates | Ref.: https://stackoverflow.com/a/54903835/10115198
     rejectUnauthorized: false,
     cert: fs.readFileSync('certs/certif.crt'),
     key: fs.readFileSync('certs/certif.key'),
     // ca: fs.readFileSync('certs/ACI-EL-ORG-TEST.crt'),
-});
+};
+const httpsAgent = new https.Agent(options);
 
 class ExpressServer {
     constructor(port, openApiYaml) {
@@ -107,7 +107,7 @@ class ExpressServer {
                         time: d.toLocaleTimeString().replace(':', 'h') + '.' + d.getMilliseconds(),
                         body
                     };
-                    console.log(req.socket.getPeerCertificate(true).raw.toString('base64'));
+                    console.log("Certificate", req.socket.getPeerCertificate(true));
                     console.log(data);
                     longPoll.publish("/poll", data);
                     send(body);
@@ -137,7 +137,9 @@ class ExpressServer {
             });
         });
 
-        http.createServer(this.app).listen(this.port);
+        // Required to access have getPeerCertificate on requests
+        // Ref.: https://stackoverflow.com/a/45437157/10115198 & https://stackoverflow.com/a/14272874/10115198
+        https.createServer(options, this.app).listen(this.port);
         console.log(`Listening on port ${this.port}`);
     }
 
