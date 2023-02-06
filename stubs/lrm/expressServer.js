@@ -107,6 +107,7 @@ class ExpressServer {
                         time: d.toLocaleTimeString().replace(':', 'h') + '.' + d.getMilliseconds(),
                         body
                     };
+                    console.log(req.socket.getPeerCertificate(true).raw.toString('base64'));
                     console.log(data);
                     longPoll.publish("/poll", data);
                     send(body);
