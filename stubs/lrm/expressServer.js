@@ -105,6 +105,7 @@ class ExpressServer {
                         endpoint: req.originalUrl,
                         code: res.statusCode,
                         time: d.toLocaleTimeString().replace(':', 'h') + '.' + d.getMilliseconds(),
+                        from: req.socket.remoteAddress,
                         body
                     };
                     console.log(data);

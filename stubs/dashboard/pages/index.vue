@@ -83,11 +83,14 @@
         </v-card-title>
         <v-card-text>
           <transition-group name="message">
-            <div v-for="{direction, endpoint, time, receivedTime, code, body} in messages" :key="time"
+            <div v-for="{direction, endpoint, time, receivedTime, code, body, from} in messages" :key="time"
                  class="message mb-4">
               <v-badge :color="code === 200 ? 'green' : 'red'" :content="code"></v-badge>
+
               <pre style="white-space: pre-wrap; background-color: rgba(0, 0, 0, 0.05);"
-                   class="elevation-1 pa-2 mt-n3">{{ direction }}{{ endpoint }}<br>{{ time }} -> {{ receivedTime }}<br>{{
+                   class="elevation-1 pa-2 mt-n3"><span v-if="from">{{ from }}<br></span>{{ direction }}{{
+                  endpoint
+                }}<br>{{ time }} -> {{ receivedTime }}<br>{{
                   body
                 }}</pre>
             </div>
@@ -133,11 +136,11 @@ export default {
         },
       },
       items: {
-        urlSiSamu: ['http://localhost:8080', 'https://www.portail.vft.si-samu.fr', 'https://www.portail.testsutilisateurs.si-samu.fr','https://www.portail.preprod.si-samu.fr' ],
-        idCrra: ['FR090', 'FR42A', 'FR870','FR080'],
+        urlSiSamu: ['http://localhost:8080', 'https://www.portail.vft.si-samu.fr', 'https://www.portail.testsutilisateurs.si-samu.fr', 'https://www.portail.preprod.si-samu.fr'],
+        idCrra: ['FR090', 'FR42A', 'FR870', 'FR080'],
         idNatPs: ['00B9814506', '1234'],
         numTel: ['0606060606'],
-        idDossier: ['22298003', 'idDossier','2301236789'],
+        idDossier: ['22298003', 'idDossier', '2301236789'],
         idAppel: ['interne-SI-SAMU'],
         idFlux: ['FR090-FluxStd-MU-P0-F02'],
         prioriteRegul: ['P0', 'P1', 'P2', 'P3', 'NR'],
