@@ -136,9 +136,9 @@ export default {
         },
       },
       items: {
-        urlSiSamu: ['http://localhost:8080', 'https://www.portail.vft.si-samu.fr', 'https://www.portail.testsutilisateurs.si-samu.fr', 'https://www.portail.preprod.si-samu.fr'],
-        idCrra: ['FR090', 'FR42A', 'FR870', 'FR080'],
-        idNatPs: ['00B9814506', '1234'],
+        urlSiSamu: ['http://localhost:8080', 'https://www.portail.vft.si-samu.fr', 'https://www.portail.testsutilisateurs.si-samu.fr', 'https://www.portail.preprod.si-samu.fr', 'https://www.portail.formation.si-samu.fr'],
+        idCrra: ['FR090', 'FR42A', 'FR870', 'FR080', 'FR530'],
+        idNatPs: ['00B9814506', '1234', '518751275100020/0000000613'],
         numTel: ['0606060606'],
         idDossier: ['22298003', 'idDossier', '2301236789'],
         idAppel: ['interne-SI-SAMU'],
@@ -223,7 +223,7 @@ export default {
     getCallData(request) {
       let endpoint, caller, method;
       if (request === 'clickToCall') {
-        endpoint = '/si-samu-back-synchro-lrm-web/api/v1/cti/' + this.form.idCrra + '/agents/' + this.form.idNatPs + '/calls';
+        endpoint = '/si-samu-back-synchro-lrm-web/api/v1/cti/' + this.form.idCrra + '/agents/' + this.form.idNatPs.replace('/', '%2F') + '/calls';
         caller = this.$axios.$post;
         method = 'POST'
       } else if (request === 'correlation') {
