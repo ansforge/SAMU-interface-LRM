@@ -136,7 +136,7 @@ export default {
         },
       },
       items: {
-        urlSiSamu: ['http://localhost:8080', 'https://www.portail.vft.si-samu.fr', 'https://www.portail.testsutilisateurs.si-samu.fr', 'https://www.portail.preprod.si-samu.fr', 'https://www.portail.formation.si-samu.fr'],
+        urlSiSamu: ['http://localhost:8080'],
         idCrra: ['FR090', 'FR42A', 'FR870', 'FR080', 'FR530'],
         idNatPs: ['00B9814506', '1234', '518751275100020/0000000613'],
         numTel: ['0606060606'],
@@ -160,7 +160,7 @@ export default {
         }
       },
       form: {
-        urlSiSamu: 'https://www.portail.vft.si-samu.fr',
+        urlSiSamu: 'http://localhost:8080',
         idCrra: 'FR090',
         idNatPs: '00B9814506',
         numTel: '0606060606',
