@@ -1,0 +1,227 @@
+name: Deploy stubs on tag
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+
+env:
+  REGISTRY: ghcr.io
+
+jobs:
+  # ── 1. Détecte quels stubs ont une nouvelle version ────────────────────────
+  detect-changes:
+    name: Detect stub version changes
+    runs-on: ubuntu-latest
+    outputs:
+      dashboard: ${{ steps.versions.outputs.dashboard }}
+      lrm: ${{ steps.versions.outputs.lrm }}
+      si_samu: ${{ steps.versions.outputs.si_samu }}
+      dashboard_version: ${{ steps.versions.outputs.dashboard_version }}
+      lrm_version: ${{ steps.versions.outputs.lrm_version }}
+      si_samu_version: ${{ steps.versions.outputs.si_samu_version }}
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Compare package versions with previous tag
+        id: versions
+        run: |
+          CURRENT_TAG="${GITHUB_REF_NAME}"
+          PREV_TAG=$(git tag --sort=-version:refname | grep -v "^${CURRENT_TAG}$" | head -1)
+          echo "Current tag: ${CURRENT_TAG} | Previous tag: ${PREV_TAG:-none}"
+
+          check_stub() {
+            local stub="$1"
+            local key="$2"
+            local version_key="$3"
+            local current
+            current=$(jq -r '.version' "stubs/${stub}/package.json")
+            echo "${version_key}=${current}" >> "$GITHUB_OUTPUT"
+
+            if [ -z "${PREV_TAG}" ]; then
+              echo "${key}=true" >> "$GITHUB_OUTPUT"
+              echo "  ${stub}: no previous tag → build (current: ${current})"
+            else
+              local prev
+              prev=$(git show "${PREV_TAG}:stubs/${stub}/package.json" 2>/dev/null \
+                | jq -r '.version' 2>/dev/null || echo "")
+              if [ "${current}" != "${prev}" ]; then
+                echo "${key}=true" >> "$GITHUB_OUTPUT"
+                echo "  ${stub}: version changed ${prev} → ${current} → build"
+              else
+                echo "${key}=false" >> "$GITHUB_OUTPUT"
+                echo "  ${stub}: version unchanged (${current}) → skip"
+              fi
+            fi
+          }
+
+          check_stub dashboard dashboard dashboard_version
+          check_stub lrm       lrm       lrm_version
+          check_stub si-samu   si_samu   si_samu_version
+
+  # ── 2. Build & push dashboard ─────────────────────────────────────────────
+  build-dashboard:
+    name: Build and push dashboard image
+    needs: detect-changes
+    if: needs.detect-changes.outputs.dashboard == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Extract image metadata
+        id: meta
+        run: |
+          VERSION=$(jq -r '.version' stubs/dashboard/package.json)
+          REPO=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "short_sha=${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+          echo "image=${{ env.REGISTRY }}/${REPO}-dashboard" >> "$GITHUB_OUTPUT"
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push dashboard image
+        uses: docker/build-push-action@v6
+        with:
+          context: stubs/dashboard
+          file: stubs/dashboard/Dockerfile
+          push: true
+          tags: |
+            ${{ steps.meta.outputs.image }}:latest
+            ${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.version }}
+            ${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.short_sha }}
+          cache-from: type=gha,scope=dashboard
+          cache-to: type=gha,mode=max,scope=dashboard
+
+  # ── 3. Build & push lrm ───────────────────────────────────────────────────
+  build-lrm:
+    name: Build and push lrm image
+    needs: detect-changes
+    if: needs.detect-changes.outputs.lrm == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Extract image metadata
+        id: meta
+        run: |
+          VERSION=$(jq -r '.version' stubs/lrm/package.json)
+          REPO=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "short_sha=${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+          echo "image=${{ env.REGISTRY }}/${REPO}-api-lrm" >> "$GITHUB_OUTPUT"
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push lrm image
+        uses: docker/build-push-action@v6
+        with:
+          context: stubs/lrm
+          file: stubs/lrm/Dockerfile
+          push: true
+          tags: |
+            ${{ steps.meta.outputs.image }}:latest
+            ${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.version }}
+            ${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.short_sha }}
+          cache-from: type=gha,scope=lrm
+          cache-to: type=gha,mode=max,scope=lrm
+
+  # ── 4. Build & push si-samu ───────────────────────────────────────────────
+  build-si-samu:
+    name: Build and push si-samu image
+    needs: detect-changes
+    if: needs.detect-changes.outputs.si_samu == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Extract image metadata
+        id: meta
+        run: |
+          VERSION=$(jq -r '.version' stubs/si-samu/package.json)
+          REPO=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "short_sha=${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+          echo "image=${{ env.REGISTRY }}/${REPO}-api-samu" >> "$GITHUB_OUTPUT"
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push si-samu image
+        uses: docker/build-push-action@v6
+        with:
+          context: stubs/si-samu
+          file: stubs/si-samu/Dockerfile
+          push: true
+          tags: |
+            ${{ steps.meta.outputs.image }}:latest
+            ${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.version }}
+            ${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.short_sha }}
+          cache-from: type=gha,scope=si-samu
+          cache-to: type=gha,mode=max,scope=si-samu
+
+  # ── 5. Deploy to CSP ──────────────────────────────────────────────────────
+  deploy-docker-images:
+    name: Deploy stub images
+    needs: [detect-changes, build-dashboard, build-lrm, build-si-samu]
+    if: |
+      !failure() && !cancelled() &&
+      (needs.build-dashboard.result == 'success' || needs.build-dashboard.result == 'skipped') &&
+      (needs.build-lrm.result == 'success' || needs.build-lrm.result == 'skipped') &&
+      (needs.build-si-samu.result == 'success' || needs.build-si-samu.result == 'skipped')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to SAMU Tools VM
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SAMU_TOOLS_HOST }}
+          username: ${{ secrets.SAMU_TOOLS_USERNAME }}
+          key: ${{ secrets.SAMU_TOOLS_PRIVATE_KEY }}
+          port: 22
+          passphrase: ${{ secrets.SAMU_TOOLS_PASSPHRASE }}
+          script: |
+            SAMU_TOOLS="interface-lrm"
+            cd samu/$SAMU_TOOLS
+            echo '${{ secrets.GITHUB_TOKEN }}' | docker login ${{ env.REGISTRY }} -u ${{ github.actor }} --password-stdin
+            echo "VERSION_DASHBOARD=${{ needs.detect-changes.outputs.dashboard_version }}" > .env
+            echo "VERSION_LRM=${{ needs.detect-changes.outputs.lrm_version }}" >> .env
+            echo "VERSION_SI_SAMU=${{ needs.detect-changes.outputs.si_samu_version }}" >> .env
+            docker compose pull
+            docker compose up -d

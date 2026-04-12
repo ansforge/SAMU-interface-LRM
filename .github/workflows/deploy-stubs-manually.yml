@@ -1,0 +1,65 @@
+name: Deploy stubs manually
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Repo tag (ex: v1.2.0)'
+        required: true
+        default: vX.Y.Z
+      instance:
+        description: 'Instance number'
+        required: true
+        default: 1
+        type: choice
+        options:
+          - 1
+          - 2
+
+env:
+  REGISTRY: ghcr.io
+
+jobs:
+  deploy:
+    name: Deploy stub Docker images
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout au tag demandé pour lire les versions des package.json
+      - name: Checkout source code at tag
+        id: checkout-source-code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.version }}
+
+      # 2. Lire la version de chaque stub dans son package.json
+      - name: Read stub versions from package.json
+        id: versions
+        run: |
+          echo "dashboard=$(jq -r '.version' stubs/dashboard/package.json)" >> "$GITHUB_OUTPUT"
+          echo "lrm=$(jq -r '.version' stubs/lrm/package.json)" >> "$GITHUB_OUTPUT"
+          echo "si_samu=$(jq -r '.version' stubs/si-samu/package.json)" >> "$GITHUB_OUTPUT"
+
+      # 3. Déployer les images sur la VM
+      - name: Deploy stub images to SAMU Tools VM
+        id: deploy-docker-images
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SAMU_TOOLS_HOST }}
+          username: ${{ secrets.SAMU_TOOLS_USERNAME }}
+          key: ${{ secrets.SAMU_TOOLS_PRIVATE_KEY }}
+          port: 22
+          passphrase: ${{ secrets.SAMU_TOOLS_PASSPHRASE }}
+          script: |
+            if [[ ${{ inputs.instance }} == "1" ]]; then
+              SAMU_TOOLS="interface-lrm"
+            else
+              SAMU_TOOLS="interface-lrm${{ inputs.instance }}"
+            fi
+            cd samu/$SAMU_TOOLS
+            echo '${{ secrets.GITHUB_TOKEN }}' | docker login ${{ env.REGISTRY }} -u ${{ github.actor }} --password-stdin
+            echo "VERSION_DASHBOARD=${{ steps.versions.outputs.dashboard }}" > .env
+            echo "VERSION_LRM=${{ steps.versions.outputs.lrm }}" >> .env
+            echo "VERSION_SI_SAMU=${{ steps.versions.outputs.si_samu }}" >> .env
+            docker compose pull
+            docker compose up -d
