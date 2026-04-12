@@ -5,6 +5,19 @@ on:
     tags:
       - 'v[0-9]+.[0-9]+.[0-9]+'
 
+  # Manual trigger to rebuild all images (e.g., for base image patches)
+  workflow_dispatch:
+    inputs:
+      rebuild_all:
+        description: 'Force rebuild all images (ignores change detection)'
+        required: false
+        type: boolean
+        default: true
+      reason:
+        description: 'Reason for rebuild (e.g., "Apply security patches")'
+        required: false
+        type: string
+
 env:
   REGISTRY: ghcr.io
 
@@ -14,9 +27,9 @@ jobs:
     name: Detect stub version changes
     runs-on: ubuntu-latest
     outputs:
-      dashboard: ${{ steps.versions.outputs.dashboard }}
-      lrm: ${{ steps.versions.outputs.lrm }}
-      si_samu: ${{ steps.versions.outputs.si_samu }}
+      dashboard: ${{ steps.force-rebuild.outputs.dashboard || steps.versions.outputs.dashboard }}
+      lrm: ${{ steps.force-rebuild.outputs.lrm || steps.versions.outputs.lrm }}
+      si_samu: ${{ steps.force-rebuild.outputs.si_samu || steps.versions.outputs.si_samu }}
       dashboard_version: ${{ steps.versions.outputs.dashboard_version }}
       lrm_version: ${{ steps.versions.outputs.lrm_version }}
       si_samu_version: ${{ steps.versions.outputs.si_samu_version }}
@@ -62,6 +75,19 @@ jobs:
           check_stub lrm       lrm       lrm_version
           check_stub si-samu   si_samu   si_samu_version
 
+      - name: Force rebuild all on manual trigger
+        id: force-rebuild
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          echo "Manual trigger detected - forcing rebuild of ALL services..."
+          echo "Reason: ${{ github.event.inputs.reason || 'Manual rebuild' }}"
+
+          # Override all outputs to force rebuild
+          echo "dashboard=true" >> $GITHUB_OUTPUT
+          echo "lrm=true" >> $GITHUB_OUTPUT
+          echo "si_samu=true" >> $GITHUB_OUTPUT
+          echo "All services marked for rebuild"
+
   # ── 2. Build & push dashboard ─────────────────────────────────────────────
   build-dashboard:
     name: Build and push dashboard image
@@ -102,8 +128,8 @@ jobs:
           push: true
           tags: |
             ${{ steps.meta.outputs.image }}:latest
-            ${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.version }}
             ${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.short_sha }}
+            ${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.version }}
           cache-from: type=gha,scope=dashboard
           cache-to: type=gha,mode=max,scope=dashboard
 
@@ -147,8 +173,8 @@ jobs:
           push: true
           tags: |
             ${{ steps.meta.outputs.image }}:latest
-            ${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.version }}
             ${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.short_sha }}
+            ${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.version }}
           cache-from: type=gha,scope=lrm
           cache-to: type=gha,mode=max,scope=lrm
 
@@ -192,8 +218,8 @@ jobs:
           push: true
           tags: |
             ${{ steps.meta.outputs.image }}:latest
-            ${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.version }}
             ${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.short_sha }}
+            ${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.version }}
           cache-from: type=gha,scope=si-samu
           cache-to: type=gha,mode=max,scope=si-samu
 
